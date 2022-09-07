@@ -25,17 +25,26 @@ const addUsers = (req, res) =>{
             res.send("Email existe");
         }else{
             pool.query( queries.addUsers,[ nick, email, clave, telefono], (error, results) =>{
-
+                res.status(201).send("Nuevo Usuario");
+                console.log("Nuevo Usuario ")
             })
         }
 
     });
 };
 const deleteUsers = (req, res) =>{
-    pool.query("DELETE ", (error,results) =>{
-        if(error) throw error;
-        res.status(200).json(results.rows);
-    })
+    const id = parseInt (req.params.id);
+
+    pool.query( queries.checkEmail, [id], (error, results) =>{
+        if(results.rows.length){
+            res.send("Usuarioo existe");
+            pool.query( queries.deleteUsers,[id], (error, results) =>{
+                res.status(201).send("Eliminar Usuario");
+                console.log("Eliminar Usuario")
+            })
+        }
+        
+    });
 };
 
 module.exports ={
