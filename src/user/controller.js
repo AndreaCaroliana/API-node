@@ -34,22 +34,49 @@ const addUsers = (req, res) =>{
 };
 const deleteUsers = (req, res) =>{
     const id = parseInt (req.params.id);
+    
+    pool.query( queries.getUserById, [id], (error, results) =>{
+       const noFound = !results.rows.length;
+       if(noFound){
+            res.send("Usuario no encontrado");
+       }
+       else{
+        pool.query(queries.deleteUsers, [id], (error, results) =>{
 
-    pool.query( queries.checkEmail, [id], (error, results) =>{
-        if(results.rows.length){
-            res.send("Usuarioo existe");
-            pool.query( queries.deleteUsers,[id], (error, results) =>{
-                res.status(201).send("Eliminar Usuario");
-                console.log("Eliminar Usuario")
-            })
-        }
+            if(error) throw error;
+                res.status(200).send("Ususario eliminado");
+             
+         });
+       }
         
     });
 };
+
+const updateUsers = (req, res) =>{
+    const id = parseInt (req.params.id);
+    const { nick } = req.body; 
+    
+    pool.query( queries.getUserById, [id], (error, results) =>{
+        const noFound = !results.rows.length;
+        if(noFound){
+             res.send("Usuario no encontrado");
+        }
+        else{
+         pool.query(queries.updateUsers, [nick,id], (error, results) =>{
+ 
+             if(error) throw error;
+                 res.status(200).send("Ususario actualizado");
+              
+          });
+        }
+        
+    });
+}
 
 module.exports ={
     getUsers,
     getUserById,
     addUsers,
-    deleteUsers
+    deleteUsers,
+    updateUsers
 };
